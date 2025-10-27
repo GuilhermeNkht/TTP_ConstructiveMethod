@@ -1,0 +1,15 @@
+/target/
+
+**/*.rs.bk
+**/*.rlib
+
+/.idea/
+/*.iml
+/Solutions
+
+*.log
+*.tmp
+*.swp
+*.swo
+.DS_Store
+.txt
