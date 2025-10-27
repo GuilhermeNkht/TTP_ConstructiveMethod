@@ -40,7 +40,7 @@ We adapted the **Circle Method** for single round-robin tournaments to ensure al
 
 ---
 
-## 🧠 Technical Stack
+## Technical Stack
 
 | Component | Description |
 |------------|-------------|
