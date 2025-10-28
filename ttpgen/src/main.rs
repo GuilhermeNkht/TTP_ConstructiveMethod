@@ -12,7 +12,6 @@ mod statistics;
 
 fn main() {
 
-
     logging::init_logger("log.txt", false);
     info!("Logger initialized");
 
