@@ -1,26 +1,77 @@
+use crate::data_set::Team;
 use crate::data_set::Rawdata;
 use std::collections::HashMap;
+use std::hash::{Hash, Hasher};
+use std::fs;
 use std::fs::File;
+use std::io::BufReader;
+use std::collections::HashSet;
 use log::{info};
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
+use serde_json::from_reader;
+use indicatif::{ProgressBar, ProgressStyle};
 
 /// Represents a solution to the Traveling Tournament Problem (TTP).
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq, Hash)]
 pub struct Solution {
     /// A matrix representing the schedule of games:
+    /// - id: identification of a solution
     /// - rows: slots (rounds)
     /// - col: teams
+    pub id: i32,
     pub solution: Vec<Vec<Game>>,
 }
 
+impl Solution{
+    pub fn new(data: &Rawdata) -> Solution{
+        Solution {
+            id: -1
+            ,solution: vec![
+                vec![
+                    Game { home_game: false, opponent: -1 };
+                    data.teams.len()
+                ];
+                data.slots.len()
+            ],
+        }
+    }
+}
+
 /// Represents a single game in the schedule.
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq, Hash)]
 pub struct Game {
     /// Indicates whether the game is at home (true) or away (false)
     pub home_game: bool,
     /// Opponent team ID
     pub opponent: i32,
+}
+
+pub struct ProgressBarLog{
+    bar: ProgressBar,
+}
+impl ProgressBarLog {
+    pub fn new(total: u64) -> Self {
+        let bar = ProgressBar::new(total);
+        bar.set_style(
+            ProgressStyle::default_bar()
+                .template(" [{elapsed_precise}] {bar:40.green/white} {pos}/{len} ({percent}%) | {msg}")
+                .progress_chars("%>="),
+        );
+        Self { bar }
+    }
+
+    pub fn inc(&self) {
+        self.bar.inc(1);
+    }
+
+    pub fn finish(&self) {
+        self.bar.finish();
+    }
+
+    pub fn set_message(&self, msg: &str) {
+        self.bar.set_message(msg);
+    }
 }
 
 impl Solution {
@@ -49,15 +100,7 @@ impl Solution {
     /// # Returns
     /// A `Solution` representing a feasible initial schedule.
     pub fn generate_initial_solution(data: &Rawdata) -> Solution {
-        let mut solution_matrix = Solution {
-            solution: vec![
-                vec![
-                    Game { home_game: false, opponent: -1 };
-                    data.teams.len()
-                ];
-                data.slots.len()
-            ],
-        };
+        let mut solution_matrix = Solution::new(&data);
 
         let num_slots = 2 * (data.teams.len() - 1);
         let mut teams: Vec<usize> = (0..data.teams.len()).collect();
@@ -87,31 +130,142 @@ impl Solution {
         solution_matrix
     }
 
-    pub fn generate_all_solutions(data: &Rawdata,traveling_distance_matrix: &Vec<Vec<i32>>, path: &str) -> Vec<Solution>{
+    pub fn has_duplicate_solutions(solutions: &Vec<Solution>) -> bool{
+        let mut seen = HashSet::new();
 
-        let mut solutions: Vec<Solution> = Vec::new();
+        for sol in solutions {
+            if !seen.insert(sol) {
+                return true;
+            }
+        }
+        false
+    }
 
-        let teams = &data.teams;
-        let mut id_solution = 0;
-        for direction in [true, false]  {
-            for fixed_team in 0..data.teams.len() {
-                for perm in teams.iter().permutations(teams.len()) {
-                    id_solution = id_solution + 1;
-                    let ids: Vec<i32> = perm.iter().map(|team| team.id).collect();
-                    println!("perm: {:?}", ids);
-                    let mut temporary_rawdata = data.clone();
-                    temporary_rawdata.teams = perm.into_iter().cloned().collect();
-                    let temporary_solution = Solution::generate_florian_solution(&temporary_rawdata, fixed_team, direction);
-                    let (distance, cap_constraints, sep_constraints, round_robin_respect) = Solution::evaluate_solution(&data,&traveling_distance_matrix,&temporary_solution);
-                    info!("Solution: \n{}Distance: {},\nCapacity Constraints: {},\nSeparation Constraints: {}, \nRound Robin Respect: {}", Solution::solution_to_string(&temporary_solution, &data),distance,cap_constraints,sep_constraints,round_robin_respect);
-                    solutions.push(temporary_solution);
-                    let file = File::create(format!("{}/solutions_{}.json", path, id_solution)).unwrap();
-                    serde_json::to_writer_pretty(file, &solutions).unwrap();
+    /// Loads all solutions from a given directory into a `Vec<Solution>`.
+    ///
+    /// This function:
+    /// - Scans the directory for files matching the pattern `solutions_*.json`.
+    /// - Deserializes each JSON file into a `Solution`.
+    /// - Returns a vector containing all solutions in sorted order.
+    ///
+    /// # Arguments
+    /// * `path` - Path to the directory containing solution JSON files.
+    pub fn load_solutions(path: &str) -> Vec<Solution> {
+        let mut all_solutions = Vec::new();
+
+        let entries = fs::read_dir(path)
+            .expect("Error opening directory");
+
+        for entry in entries {
+            let entry = entry.expect("Error at path");
+            let path = entry.path();
+
+            if path.is_file() {
+                if let Some(filename) = path.file_name().and_then(|n| n.to_str()) {
+                    if filename.starts_with("solutions_") && filename.ends_with(".json") {
+                        let file = File::open(&path).expect("Error opening file");
+                        let reader = BufReader::new(file);
+
+                        let solution: Solution = from_reader(reader).expect("Error deserializing JSON");
+
+                        all_solutions.push(solution);
+                    }
                 }
             }
         }
 
-        solutions
+        all_solutions.sort_by_key(|s| s.id);
+        all_solutions
+    }
+
+    pub fn generate_distances(solutions: Vec<Solution>, data: &Rawdata, traveling_distance_matrix: &Vec<Vec<i32>>) -> Vec<i128>{
+        let mut all_distances: Vec<i128> = Vec::new();
+
+        for solution in solutions{
+
+            let (distance, _, _, _) = Solution::evaluate_solution(data, traveling_distance_matrix, &solution);
+
+            all_distances.push(distance as i128);
+
+        }
+
+        all_distances
+    }
+
+    fn log_solution(solution: &Solution, data: &Rawdata, traveling_distance_matrix: &Vec<Vec<i32>>) -> i32{
+        let (distance, cap_constraints, sep_constraints, round_robin_respect) =
+            Solution::evaluate_solution(data, traveling_distance_matrix, solution);
+
+        let solution_str = Solution::solution_to_string(solution, data);
+        info!(
+            "Solution:\n{}\nDistance: {}\nCapacity Constraints: {}\nSeparation Constraints: {}\nRound Robin Respect: {}",
+            solution_str, distance, cap_constraints, sep_constraints, round_robin_respect
+        );
+
+        distance
+    }
+
+    fn save_to_file(&self, path: &str) -> std::io::Result<()> {
+        let file = File::create(path)?;
+        serde_json::to_writer_pretty(file, self)?;
+        Ok(())
+    }
+
+    fn generate_solution(data: &Rawdata, perm: Vec<Team>, fixed_team: usize, upward: bool, id: i32, ) -> Solution {
+        let mut temporary_data = data.clone();
+        temporary_data.teams = perm;
+        let mut solution = Solution::generate_florian_solution(&temporary_data, fixed_team, upward);
+        solution.id = id;
+
+        solution
+    }
+
+    pub fn generate_all_solutions(data: &Rawdata,traveling_distance_matrix: &Vec<Vec<i32>>, path: &str) -> (Vec<Solution>, Vec<i128>){
+        info!("Generating all solutions");
+        let mut solutions: Vec<Solution> = Vec::new();
+        let mut all_distances: Vec<i128> = Vec::new();
+
+        let teams = &data.teams;
+        let mut id_solution = 0;
+
+        let total_perms = 2 * data.teams.len() * teams.iter().permutations(teams.len()).count();
+
+        // Create progress bar
+        let progress = ProgressBarLog::new(total_perms as u64);
+
+        for direction in [true, false]  {
+            for fixed_team in 0..data.teams.len() {
+                for perm in teams.iter().permutations(teams.len()) {
+                    id_solution = id_solution + 1;
+
+                    // Log the permutation
+                    let ids: Vec<i32> = perm.iter().map(|team| team.id).collect();
+                    info!("Permutation: {:?}", ids);
+
+                    // Generate solution
+                    let temporary_solution = Solution::generate_solution(&data, perm.into_iter().cloned().collect(), fixed_team, direction, id_solution);
+
+                    // Log solution details
+                    let distance_solution = Solution::log_solution(&temporary_solution, &data, &traveling_distance_matrix);
+
+                    // Store the solution and the distance
+                    solutions.push(temporary_solution.clone());
+                    all_distances.push(distance_solution as i128);
+
+                    // Save to file
+                    temporary_solution.save_to_file(&format!("{}/solutions_{}.json", path, id_solution)).unwrap();
+
+                    // Update bar inc
+                    progress.inc();
+
+                    if id_solution == 5000{
+                        return (solutions,all_distances)
+                    }
+                }
+            }
+        }
+
+        (solutions,all_distances)
     }
 
     /// # Description
@@ -131,7 +285,6 @@ impl Solution {
     /// let sol = Solution::generate_florian_solution(&data, 0, true);
     /// Solution::print_solution(&sol, &data);
     pub fn generate_florian_solution(data: &Rawdata, fixed_team: usize, upward: bool) -> Solution {
-
         info!(
             "Starting Florian's construction for {} teams | Fixed team: {} | Pattern: {}",
             data.teams.len(),
@@ -139,15 +292,7 @@ impl Solution {
             if upward { "Upward direction" } else { "Downward direction" }
         );
 
-        let mut solution_matrix = Solution {
-            solution: vec![
-                vec![
-                    Game { home_game: false, opponent: -1 };
-                    data.teams.len()
-                ];
-                data.slots.len()
-            ],
-        };
+        let mut solution_matrix = Solution::new(&data);
 
         let mut teams: Vec<usize> = data
             .teams
@@ -155,7 +300,6 @@ impl Solution {
             .enumerate()
             .map(|(_, team)| team.id as usize)
             .collect();
-
 
         let fixed_team = teams.remove(fixed_team);
         teams.push(fixed_team);
@@ -175,17 +319,21 @@ impl Solution {
                     solution_matrix.solution[round][team_a] = Game { home_game: false, opponent: team_b as i32 };
                     solution_matrix.solution[round][team_b] = Game { home_game: true, opponent: team_a as i32 };
                 }
+
                 info!(
                 "Pairing: Team {} vs Team {} | {} is home",
                 team_a,
                 team_b,
                 if home_first { team_a } else { team_b }
                 );
+
             }
+
             let fixed_team = teams.remove(teams.len()-1);
             teams.rotate_right(1);
             teams.push(fixed_team);
             info!("Teams after rotation: {:?}", teams);
+
         }
 
         info!("Final solution for {} teams | Fixed team: {} | Pattern: {}",
@@ -206,6 +354,7 @@ impl Solution {
     /// A [`String`] representing the formatted schedule.
     pub fn solution_to_string(solution_matrix: &Solution, data: &Rawdata) -> String {
         let mut output = String::new();
+        output.push_str(&format!("Id: {}\n", solution_matrix.id));
 
         output.push_str(&format!("{:>8}", ""));
         for team_id in 0..data.teams.len() {
@@ -235,8 +384,7 @@ impl Solution {
     /// 1. Number of capacity constraint violations
     /// 2. Number of separation constraint violations
     /// 3. Boolean indicating if round-robin constraints are respected
-    pub fn check_constraints(data : &Rawdata, solution_matrix : &Solution) -> (i32,i32,bool) {
-
+    fn check_constraints(data : &Rawdata, solution_matrix : &Solution) -> (i32,i32,bool) {
         let num_slots = solution_matrix.solution.len();
         let num_teams = solution_matrix.solution[0].len();
         let mut capacity_constraints = 0;
@@ -253,8 +401,8 @@ impl Solution {
                         .filter(|slot| {
                             let game = &slot[team];
                             match constraint.c_mode1 {
-                                'H' => game.home_game,
-                                'A' => !game.home_game,
+                                'A' => game.home_game,
+                                'H' => !game.home_game,
                                 _ => false,
                             }
                         })
@@ -292,7 +440,7 @@ impl Solution {
             }
         }
 
-        // Round robin constraints
+        // Round-robin constraints
 
         let mut match_count: HashMap<(usize, usize), i32> = HashMap::new();
 
@@ -327,8 +475,7 @@ impl Solution {
     ///
     /// # Returns
     /// Total traveling distance as `i32`.
-    pub fn evaluate_objective(traveling_distance_matrix : &Vec<Vec<i32>>, solution_matrix : &Solution) -> i32{
-
+    fn evaluate_objective(traveling_distance_matrix : &Vec<Vec<i32>>, solution_matrix : &Solution) -> i32{
         let num_slots = solution_matrix.solution.len();
         let num_teams = solution_matrix.solution[0].len();
         let mut total_distance = 0;
@@ -359,11 +506,7 @@ impl Solution {
     /// 2. Capacity constraint violations
     /// 3. Separation constraint violations
     /// 4. Boolean indicating if round-robin constraints are respected
-    pub fn evaluate_solution(
-        data: &Rawdata,
-        traveling_distance_matrix: &Vec<Vec<i32>>,
-        solution_matrix: &Solution,
-    ) -> (i32, i32, i32, bool) {
+    pub fn evaluate_solution(data: &Rawdata, traveling_distance_matrix: &Vec<Vec<i32>>, solution_matrix: &Solution) -> (i32, i32, i32, bool) {
         let (cap_constraints, sep_constraints, round_robin_respect) = Self::check_constraints(data, solution_matrix);
         let result = Self::evaluate_objective(traveling_distance_matrix, solution_matrix);
         (result, cap_constraints, sep_constraints, round_robin_respect)

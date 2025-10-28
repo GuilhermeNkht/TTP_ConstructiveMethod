@@ -4,8 +4,8 @@ use log::LevelFilter;
 use std::fs::OpenOptions;
 use std::io::Write;
 
-pub fn init_logger(log_file: &str) {
-    // Abre o arquivo de log em modo append
+pub fn init_logger(log_file: &str, console_log: bool) {
+
     let file = OpenOptions::new()
         .create(true)
         .write(true)
@@ -18,8 +18,10 @@ pub fn init_logger(log_file: &str) {
             let timestamp = Local::now().format("%H:%M:%S");
             let line = format!("[{}][{}] {}\n", timestamp, record.level(), record.args());
 
-            print!("{}", line);
-            std::io::stdout().flush().unwrap();
+            if console_log{
+                print!("{}", line);
+                std::io::stdout().flush().unwrap();
+            }
 
             let mut file = &file;
             file.write_all(line.as_bytes()).unwrap();
@@ -29,4 +31,5 @@ pub fn init_logger(log_file: &str) {
         .filter(None, LevelFilter::Info)
         .target(Target::Stdout)
         .init();
+
 }
