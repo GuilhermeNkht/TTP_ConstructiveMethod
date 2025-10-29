@@ -12,7 +12,9 @@ mod statistics;
 
 fn main() {
 
-    logging::init_logger("log.txt", false);
+    let permutation = vec![0,3,2,1,10,5,6,7,8,9,4,11];
+
+    logging::init_logger("log.txt");
     info!("Logger initialized");
 
     info!("Loading instance file");
@@ -21,18 +23,21 @@ fn main() {
     info!("Generating traveling distance matrix");
     let traveling_distance_matrix = Solution::generate_traveling_distance_matrix(&raw_data_set);
 
-    // let (solutions, distances) = Solution::generate_all_solutions(&raw_data_set, &traveling_distance_matrix,"solutions");
+    info!("Generating all solutions");
+    let (solutions, distances) = Solution::generate_all_solutions(&raw_data_set, &traveling_distance_matrix,permutation,"solutions");
 
-    let loaded = Solution::load_solutions("solutions/");
-    println!("{}", Solution::has_duplicate_solutions(&loaded));
+    Statistics::generate_statistics(&distances);
 
-    let sum = Solution::generate_distances(loaded, &raw_data_set, &traveling_distance_matrix);
 
-    let total: i128 = sum.iter().sum();
-
-    println!("Sum: {}", total);
-
-    Statistics::generate_statistics(&sum);
+    // let loaded = Solution::load_solutions("solutions/");
+    // println!("{}", Solution::has_duplicate_solutions(&loaded));
+    //
+    // let sum = Solution::generate_distances(loaded, &raw_data_set, &traveling_distance_matrix);
+    //
+    // let total: i128 = sum.iter().sum();
+    //
+    // println!("Sum: {}", total);
+    //
 
 
     // let initial_solution = Solution::generate_initial_solution(&raw_data_set);
