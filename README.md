@@ -71,9 +71,9 @@ The Traveling Tournament Problem (TTP) schedules a double round-robin tournament
 
 ### Installation
 
-git clone <repository_url>
-cd ttpgen
-cargo build --release
+    git clone <repository_url>
+    cd ttpgen
+    cargo build --release
 
 ---
 
@@ -81,7 +81,7 @@ cargo build --release
 
 After building, run the executable with:
 
-cargo run --release --package ttpgen --bin ttpgen -- [OPTIONS]
+    cargo run --release --package ttpgen --bin ttpgen -- [OPTIONS]
 
 ### Command-line Options
 
