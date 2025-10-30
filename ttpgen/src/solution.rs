@@ -1,16 +1,21 @@
-use crate::data_set::Team;
-use crate::data_set::Rawdata;
-use std::collections::HashMap;
+// Std library
+use std::collections::{HashMap, HashSet};
+use std::fs::{self, File};
 use std::hash::{Hash, Hasher};
-use std::fs;
-use std::fs::File;
 use std::io::BufReader;
-use std::collections::HashSet;
-use log::{info};
+
+// External crates
+use indicatif::{ProgressBar, ProgressStyle};
 use itertools::Itertools;
+use log::info;
+use rand::SeedableRng;
+use rand::rngs::StdRng;
+use rand::seq::SliceRandom;
 use serde::{Deserialize, Serialize};
 use serde_json::from_reader;
-use indicatif::{ProgressBar, ProgressStyle};
+
+// Local modules
+use crate::data_set::{Rawdata, Team};
 
 #[cfg(debug_assertions)]
 pub const SAVE_ENABLED: bool = true;
@@ -18,81 +23,287 @@ pub const SAVE_ENABLED: bool = true;
 #[cfg(not(debug_assertions))]
 pub const SAVE_ENABLED: bool = true;
 
-/// Represents a solution to the Traveling Tournament Problem (TTP).
+/// Saves any serializable data to a json file.
+///
+/// This function serializes the provided data structure into a json format
+/// and writes it to the specified file path. It works with any type
+/// that implements `serde::Serialize`.
+///
+/// # Arguments
+/// * `data` - A reference to the data to serialize and save.
+/// * `path` - A string slice specifying the file path.
+///
+/// # Returns
+/// A `Result` indicating success (`Ok(())`) or failure (`Err`) with an I/O error.
+///
+/// # Example
+/// ```
+/// use serde::Serialize;
+/// #[derive(Serialize)]
+/// struct Example {
+///     id: u32,
+///     name: String,
+/// }
+///
+/// let data = Example { id: 1, name: "Test".to_string() };
+/// save_to_file(&data, "output/example.json").expect("Failed to save file");
+/// ```
+pub fn save_to_file<T: Serialize>(data: &T, path: &str) -> std::io::Result<()> {
+    let file = File::create(path)?;
+    serde_json::to_writer_pretty(file, data)?;
+    Ok(())
+}
+
+/// Represents a single match/game between two teams.
+///
+/// The `Game` struct stores the home/away status and the opponent's ID.
+///
+/// # Fields
+/// * `home_game` - A boolean indicating if the team is playing at home (`true`) or away (`false`).
+/// * `opponent` - The ID of the opponent team.
+///
+/// # Example
+/// ```
+/// let match_game = Game {
+///     home_game: true,
+///     opponent: 5,
+/// };
+/// println!("Home game: {}, Opponent: {}", match_game.home_game, match_game.opponent);
+/// ```
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq, Hash)]
+pub struct Game {
+    pub home_game: bool,
+    pub opponent: i32,
+}
+
+/// Represents a set of generated team permutations along with metadata.
+///
+/// `Permutations` stores multiple random permutations of team IDs,
+/// along with the seed used for generation and the instance name. This is useful
+/// for saving and later reusing or analyzing the generated permutations.
+///
+/// # Fields
+/// * `seed` - The seed used for generating the permutations.
+/// * `instance_name` - The name of the problem instance.
+/// * `permutations` - A vector of vectors, where each inner vector represents one permutation of team IDs.
+///
+/// # Example
+/// ```
+/// let perms = Permutations {
+///     seed: 42,
+///     instance_name: "instance_01".to_string(),
+///     permutations: vec![
+///         vec![0,1,2,3],
+///         vec![3,2,1,0],
+///     ],
+/// };
+/// ```
+#[derive(Serialize)]
+pub struct Permutations {
+    pub seed: u64,
+    pub instance_name: String,
+    pub permutations: Vec<Vec<i32>>,
+}
+
+/// A simple wrapper around `ProgressBar` for logging progress.
+///
+/// # Example
+/// ```
+/// let progress = ProgressBarLog::new(100);
+/// for i in 0..100 {
+///     progress.set_message(&format!("Processing item {}", i));
+///     progress.inc();
+/// }
+/// progress.finish();
+/// ```
+pub struct ProgressBarLog {
+    bar: ProgressBar,
+}
+
+/// A simple wrapper around `ProgressBar` for logging progress.
+///
+/// `ProgressBarLog` provides a convenient interface to create and manipulate a progress bar
+/// with custom styling and logging messages. This is useful for tracking long-running
+/// operations, like generating or evaluating multiple scheduling solutions.
+///
+/// # Example
+/// ```
+/// let progress = ProgressBarLog::new(100);
+/// for i in 0..100 {
+///     progress.set_message(&format!("Processing item {}", i));
+///     progress.inc();
+/// }
+/// progress.finish();
+/// ```
+impl ProgressBarLog {
+    /// Creates a new `ProgressBarLog` with the given total count.
+    ///
+    /// # Arguments
+    /// * `total` - The total number of steps to complete.
+    ///
+    /// # Returns
+    /// A `ProgressBarLog` instance with custom styling.
+    pub fn new(total: u64) -> Self {
+        let bar = ProgressBar::new(total);
+        bar.set_style(
+            ProgressStyle::default_bar()
+                .template(
+                    " [{elapsed_precise}] {bar:40.green/white} {pos}/{len} ({percent}%) | {msg}",
+                )
+                .progress_chars("%>="),
+        );
+        Self { bar }
+    }
+
+    /// Increments the progress bar by one step.
+    pub fn inc(&self) {
+        self.bar.inc(1);
+    }
+
+    /// Finishes the progress bar, marking it as complete.
+    pub fn finish(&self) {
+        self.bar.finish();
+    }
+
+    /// Sets a custom message to display alongside the progress bar.
+    ///
+    /// # Arguments
+    /// * `msg` - The message string to display.
+    pub fn set_message(&self, msg: &str) {
+        self.bar.set_message(msg);
+    }
+}
+
+/// Represents a solution for the scheduling problem.
+///
+/// Each `Solution` contains an `id` identifying the solution,
+/// and a `solution` matrix where `solution[slot][team]`
+/// stores a `Game` indicating the opponent and if the game is home or away.
+///
+/// # Fields
+/// * `id` - A unique identifier for the solution.
+/// * `solution` - A 2D vector of `Game` instances representing the schedule matrix.
+///
+/// # Example
+/// ```
+/// let solution = Solution {
+///     id: 1,
+///     solution: vec![vec![Game { home_game: true, opponent: 2 }]],
+/// };
+/// println!("Solution ID: {}", solution.id);
+/// ```
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq, Hash)]
 pub struct Solution {
-    /// A matrix representing the schedule of games:
-    /// - id: identification of a solution
-    /// - rows: slots (rounds)
-    /// - col: teams
     pub id: i32,
     pub solution: Vec<Vec<Game>>,
 }
 
-impl Solution{
-    pub fn new(data: &Rawdata) -> Solution{
+impl Solution {
+
+    /// Creates a new, empty `Solution` instance initialized with default game values.
+    ///
+    /// This function constructs a solution matrix where each slot and team position
+    /// is filled with a `Game`:
+    /// - `home_game` is set to `false`
+    /// - `opponent` is set to `-1` (indicating: no opponent assigned yet)
+    ///
+    /// # Arguments
+    /// * `data` - A reference to the `Rawdata` structure containing teams and slots
+    ///   information. The size of the solution matrix is derived from:
+    ///   - `data.teams.len()`
+    ///   - `data.slots.len()`
+    ///
+    /// # Returns
+    /// A `Solution` struct with:
+    /// - `id` initialized to `-1`
+    /// - `solution` initialized as a `slots x teams` matrix filled with default games.
+    ///
+    /// # Example
+    /// ```
+    /// let data = Rawdata::generate_example();
+    /// let solution = Solution::new(&data);
+    /// assert_eq!(solution.solution.len(), data.slots.len());
+    /// assert_eq!(solution.solution[0].len(), data.teams.len());
+    /// ```
+    pub fn new(data: &Rawdata) -> Solution {
         Solution {
-            id: -1
-            ,solution: vec![
+            id: -1,
+            solution: vec![
                 vec![
-                    Game { home_game: false, opponent: -1 };
+                    Game {
+                        home_game: false,
+                        opponent: -1
+                    };
                     data.teams.len()
                 ];
                 data.slots.len()
             ],
         }
     }
-}
 
-/// Represents a single game in the schedule.
-#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq, Hash)]
-pub struct Game {
-    /// Indicates whether the game is at home (true) or away (false)
-    pub home_game: bool,
-    /// Opponent team ID
-    pub opponent: i32,
-}
-
-pub struct ProgressBarLog{
-    bar: ProgressBar,
-}
-impl ProgressBarLog {
-    pub fn new(total: u64) -> Self {
-        let bar = ProgressBar::new(total);
-        bar.set_style(
-            ProgressStyle::default_bar()
-                .template(" [{elapsed_precise}] {bar:40.green/white} {pos}/{len} ({percent}%) | {msg}")
-                .progress_chars("%>="),
-        );
-        Self { bar }
-    }
-
-    pub fn inc(&self) {
-        self.bar.inc(1);
-    }
-
-    pub fn finish(&self) {
-        self.bar.finish();
-    }
-
-    pub fn set_message(&self, msg: &str) {
-        self.bar.set_message(msg);
-    }
-}
-
-impl Solution {
-
+    /// Generates a traveling distance matrix based on the distance in `Rawdata`.
+    ///
+    /// This function constructs a 2D matrix where each cell `(i, j)` represents the
+    /// distance traveled from team `i` to team `j`. The matrix is initialized with
+    /// zeros and populated using the `distances` list contained inside `Rawdata`.
+    ///
+    /// # Arguments
+    /// * `data` - A reference to the `Rawdata` structure containing team distance
+    ///   relationships. `data.distances` is expected to list distances between pairs
+    ///   of teams.
+    ///
+    /// # Returns
+    /// A 2D vector (`Vec<Vec<i32>>`) where:
+    /// - The row index corresponds to the origin team
+    /// - The column index corresponds to the destination team
+    /// - Each cell contains the travel distance between them
+    ///
+    /// # Example
+    /// ```
+    /// let data = Rawdata::generate_example();
+    /// let distance_matrix = generate_traveling_distance_matrix(&data);
+    ///
+    /// println!("Distance: {}", distance_matrix[0][2]);
+    /// ```
     pub fn generate_traveling_distance_matrix(data: &Rawdata) -> Vec<Vec<i32>> {
         let mut traveling_distance_matrix = vec![vec![0i32; data.teams.len()]; data.teams.len()];
 
         for distance in &data.distances {
-            traveling_distance_matrix[distance.team1 as usize][distance.team2 as usize] = distance.dist;
+            traveling_distance_matrix[distance.team1 as usize][distance.team2 as usize] =
+                distance.dist;
         }
 
         traveling_distance_matrix
     }
 
-    pub fn has_duplicate_solutions(solutions: &Vec<Solution>) -> bool{
+    /// Checks if a list of `Solution` objects contains duplicates.
+    ///
+    /// This function iterates over all solutions and attempts to insert each one into a
+    /// `HashSet`. If insertion fails for any solution, it means a duplicate exists,
+    /// and the function returns `true`.
+    ///
+    /// # Arguments
+    /// * `solutions` - A reference to a vector of `Solution` instances to be checked.
+    ///
+    /// # Returns
+    /// * `true` if one or more duplicates are found.
+    /// * `false` if all solutions are unique.
+    ///
+    /// # Requirements
+    /// The `Solution` type must implement:
+    /// - `Hash`
+    /// - `Eq`
+    ///
+    /// # Example
+    /// ```
+    /// let solutions = load_solutions("output/solutions/");
+    /// if has_duplicate_solutions(&solutions) {
+    ///     println!("Duplicate.");
+    /// } else {
+    ///     println!("No duplicates.");
+    /// }
+    /// ```
+    pub fn has_duplicate_solutions(solutions: &Vec<Solution>) -> bool {
         let mut seen = HashSet::new();
 
         for sol in solutions {
@@ -103,12 +314,38 @@ impl Solution {
         false
     }
 
-
+    /// Loads all solution files from a directory and returns them as a vector of `Solution`.
+    ///
+    /// This function scans the directory for files whose names follow the pattern
+    /// `solutions_*.json`. Each file is opened, deserialized into a `Solution`,
+    /// and collected into a vector. After loading, the solutions are sorted in ascending
+    /// order based on their `id` field.
+    ///
+    /// # Arguments
+    /// * `path` - A string slice representing the directory to search for solution files.
+    ///
+    /// # Returns
+    /// A vector of `Solution` objects loaded from the directory.
+    ///
+    /// # Panics
+    /// This function will panic if:
+    /// - The directory cannot be read.
+    /// - A file cannot be opened.
+    /// - A JSON file cannot be deserialized into a `Solution`.
+    ///
+    /// # Example
+    /// ```
+    /// let solutions = load_solutions("output/solutions/");
+    /// println!("Loaded {} solutions", solutions.len());
+    ///
+    /// if let Some(first) = solutions.first() {
+    ///     println!("First solution ID: {}", first.id);
+    /// }
+    /// ```
     pub fn load_solutions(path: &str) -> Vec<Solution> {
         let mut all_solutions = Vec::new();
 
-        let entries = fs::read_dir(path)
-            .expect("Error opening directory");
+        let entries = fs::read_dir(path).expect("Error opening directory");
 
         for entry in entries {
             let entry = entry.expect("Error at path");
@@ -120,7 +357,8 @@ impl Solution {
                         let file = File::open(&path).expect("Error opening file");
                         let reader = BufReader::new(file);
 
-                        let solution: Solution = from_reader(reader).expect("Error deserializing JSON");
+                        let solution: Solution =
+                            from_reader(reader).expect("Error deserializing JSON");
 
                         all_solutions.push(solution);
                     }
@@ -155,11 +393,16 @@ impl Solution {
     /// let distances = generate_distances(solutions, &data, &distance_matrix);
     /// println!("All distances: {:?}", distances);
     /// ```
-    pub fn generate_distances(solutions: Vec<Solution>, data: &Rawdata, traveling_distance_matrix: &Vec<Vec<i32>>) -> Vec<i128>{
+    pub fn generate_distances(
+        solutions: Vec<Solution>,
+        data: &Rawdata,
+        traveling_distance_matrix: &Vec<Vec<i32>>,
+    ) -> Vec<i128> {
         let mut all_distances: Vec<i128> = Vec::new();
 
-        for solution in solutions{
-            let (distance, _, _, _) = Solution::evaluate_solution(data, traveling_distance_matrix, &solution);
+        for solution in solutions {
+            let (distance, _, _, _) =
+                Solution::evaluate_solution(data, traveling_distance_matrix, &solution);
 
             all_distances.push(distance as i128);
         }
@@ -189,7 +432,11 @@ impl Solution {
     /// let distance = Solution::log_solution(&solution, &data, &vec![vec![0,5,7], vec![5,0,3], vec![7,3,0]]);
     /// println!("Total distance: {}", distance);
     /// ```
-    fn log_solution(solution: &Solution, data: &Rawdata, traveling_distance_matrix: &Vec<Vec<i32>>) -> i32{
+    fn log_solution(
+        solution: &Solution,
+        data: &Rawdata,
+        traveling_distance_matrix: &Vec<Vec<i32>>,
+    ) -> i32 {
         let (distance, cap_constraints, sep_constraints, round_robin_respect) =
             Solution::evaluate_solution(data, traveling_distance_matrix, solution);
 
@@ -200,28 +447,6 @@ impl Solution {
         );
 
         distance
-    }
-
-    /// Saves the current `Solution` instance to a JSON.
-    ///
-    /// This function serializes the `Solution` into a JSON format
-    /// and writes it to the specified file path.
-    ///
-    /// # Arguments
-    /// * `path` - A string slice specifying the file path where the JSON will be saved.
-    ///
-    /// # Returns
-    /// A `Result` indicating success (`Ok(())`) or failure (`Err`) with an I/O error.
-    ///
-    /// # Example
-    /// ```
-    /// let solution = Solution::generate_example();
-    /// solution.save_to_file("output/solution_1.json").expect("Failed to save solution");
-    /// ```
-    fn save_to_file(&self, path: &str) -> std::io::Result<()> {
-        let file = File::create(path)?;
-        serde_json::to_writer_pretty(file, self)?;
-        Ok(())
     }
 
     /// Generates a complete solution for a given team permutation using Florian's method.
@@ -247,13 +472,69 @@ impl Solution {
     /// let solution = generate_solution(&data, &perm, 0, true, 1);
     /// println!("{}", solution_to_string(&solution, &data));
     /// ```
-    fn generate_solution(data: &Rawdata, perm: &Vec<Team>, fixed_team: usize, upward: bool, id: i32, ) -> Solution {
+    fn generate_solution(
+        data: &Rawdata,
+        perm: &Vec<Team>,
+        fixed_team: usize,
+        upward: bool,
+        id: i32,
+    ) -> Solution {
         let mut temporary_data = data.clone();
         temporary_data.teams = perm.clone();
         let mut solution = Solution::generate_florian_solution(&temporary_data, fixed_team, upward);
         solution.id = id;
 
         solution
+    }
+
+    /// Generates a set of unique random permutations of the team IDs.
+    ///
+    /// This function takes the list of teams from `Rawdata` and generates the requested number of
+    /// unique permutations. Each permutation is randomized and stored in a `Vec<i32>`.
+    ///
+    /// # Arguments
+    /// * `data` - A reference to the `Rawdata` struct containing the list of teams.
+    /// * `number_permutation` - A reference to an `i32` specifying how many unique permutations
+    ///   should be generated.
+    ///
+    /// # Returns
+    /// A vector of vectors (`Vec<Vec<i32>>`), where each inner vector is a unique permutation
+    /// of the team IDs.
+    ///
+    /// # Example
+    /// ```
+    /// let data = Rawdata::generate_example();
+    /// let permutations = generate_random_permutations(&data, &5);
+    /// ```
+    pub fn generate_random_permutations(
+        data: &Rawdata,
+        number_permutations: i32,
+        seed: u64,
+        path: &str,
+    ) -> Vec<Vec<i32>> {
+        let team_ids: Vec<i32> = data.teams.iter().map(|t| t.id).collect();
+
+        let mut rng = StdRng::seed_from_u64(seed);
+        let mut permutations: HashSet<Vec<i32>> = HashSet::new();
+
+        while permutations.len() < number_permutations as usize {
+            let mut perm = team_ids.clone();
+            perm.shuffle(&mut rng);
+            permutations.insert(perm);
+        }
+
+        let vec_perm: Vec<Vec<i32>> = permutations.into_iter().collect();
+
+        if SAVE_ENABLED {
+            let permutations_to_save = Permutations {
+                seed,
+                instance_name: data.instance_name.clone(),
+                permutations: vec_perm.clone(),
+            };
+            save_to_file(&permutations_to_save, &format!("{}/permutation.json", path)).unwrap();
+        }
+
+        vec_perm
     }
 
     /// Generates all possible solutions for a given team permutation using Florian's method,
@@ -267,7 +548,7 @@ impl Solution {
     /// * `data` - A reference to the `Rawdata` containing teams, slots, and constraints.
     /// * `traveling_distance_matrix` - A reference to a 2D vector where `matrix[i][j]` represents
     ///   the distance from team `i` to team `j`.
-    /// * `permutation` - A vector of team IDs representing the order in which teams are considered.
+    /// * `permutation` - A vector of vect of team IDs representing the order in which teams are considered.
     /// * `path` - A string slice representing the directory path where solutions will be saved if `SAVE_ENABLED` is true.
     ///
     /// # Returns
@@ -287,48 +568,72 @@ impl Solution {
     /// println!("Solutions length {}", solutions.len());
     /// println!("Distances: {:?}", distances);
     /// ```
-    pub fn generate_all_solutions(data: &Rawdata,traveling_distance_matrix: &Vec<Vec<i32>>, permutation: Vec<i32>, path: &str) -> (Vec<Solution>, Vec<i128>){
+    pub fn generate_all_solutions(
+        data: &Rawdata,
+        traveling_distance_matrix: &Vec<Vec<i32>>,
+        permutation: Vec<Vec<i32>>,
+        path: &str,
+    ) -> (Vec<Solution>, Vec<i128>) {
         let mut solutions: Vec<Solution> = Vec::new();
         let mut all_distances: Vec<i128> = Vec::new();
 
-        let teams = &data.teams;
         let mut id_solution = 0;
 
-        let total_perms = 2 * data.teams.len();
+        let total_perms = 2 * data.teams.len() * permutation.len();
 
         // Create progress bar
         let progress = ProgressBarLog::new(total_perms as u64);
 
-        let teams_ordered: Vec<Team> = permutation.iter().filter_map(|id| data.teams.iter().find(|t| t.id == *id)).cloned().collect();
+        for team in permutation {
+            let teams_ordered: Vec<Team> = team
+                .iter()
+                .filter_map(|id| data.teams.iter().find(|t| t.id == *id))
+                .cloned()
+                .collect();
 
-        // Log the permutation
-        info!("Permutation: {:?}", permutation);
+            // Log the permutation
+            info!("Permutation: {:?}", team);
 
-        for direction in [true, false]  {
-            for fixed_team in 0..data.teams.len() {
-                id_solution = id_solution + 1;
+            for direction in [true, false] {
+                for fixed_team in 0..data.teams.len() {
+                    id_solution = id_solution + 1;
 
-                // Generate solution
-                let temporary_solution = Solution::generate_solution(&data, &teams_ordered, fixed_team, direction, id_solution);
+                    // Generate solution
+                    let temporary_solution = Solution::generate_solution(
+                        &data,
+                        &teams_ordered,
+                        fixed_team,
+                        direction,
+                        id_solution,
+                    );
 
-                // Log solution details
-                let distance_solution = Solution::log_solution(&temporary_solution, &data, &traveling_distance_matrix);
+                    // Log solution details
+                    let distance_solution = Solution::log_solution(
+                        &temporary_solution,
+                        &data,
+                        &traveling_distance_matrix,
+                    );
 
-                // Store the solution and the distance
-                solutions.push(temporary_solution.clone());
-                all_distances.push(distance_solution as i128);
+                    // Store the solution and the distance
+                    solutions.push(temporary_solution.clone());
+                    all_distances.push(distance_solution as i128);
 
-                // Save to file
-                if(SAVE_ENABLED){
-                    temporary_solution.save_to_file(&format!("{}/solutions_{}.json", path, id_solution)).unwrap();
+                    // Save to file
+                    if (SAVE_ENABLED) {
+                        save_to_file(
+                            &temporary_solution,
+                            &format!("{}/solution_{}.json", path, id_solution),
+                        )
+                        .unwrap();
+                    }
+
+                    // Update bar inc
+                    progress.inc();
                 }
-
-                // Update bar inc
-                progress.inc();
             }
         }
 
-        (solutions,all_distances)
+        (solutions, all_distances)
     }
 
     /// Generates a schedule using Florian's method construction.
@@ -356,7 +661,11 @@ impl Solution {
             "Starting Florian's construction for {} teams | Fixed team: {} | Pattern: {}",
             data.teams.len(),
             fixed_team,
-            if upward { "Upward direction" } else { "Downward direction" }
+            if upward {
+                "Upward direction"
+            } else {
+                "Downward direction"
+            }
         );
 
         let mut solution_matrix = Solution::new(&data);
@@ -380,33 +689,49 @@ impl Solution {
                 let home_first = (round % 2 == 0) == upward;
 
                 if home_first {
-                    solution_matrix.solution[round][team_a] = Game { home_game: true, opponent: team_b as i32 };
-                    solution_matrix.solution[round][team_b] = Game { home_game: false, opponent: team_a as i32 };
+                    solution_matrix.solution[round][team_a] = Game {
+                        home_game: true,
+                        opponent: team_b as i32,
+                    };
+                    solution_matrix.solution[round][team_b] = Game {
+                        home_game: false,
+                        opponent: team_a as i32,
+                    };
                 } else {
-                    solution_matrix.solution[round][team_a] = Game { home_game: false, opponent: team_b as i32 };
-                    solution_matrix.solution[round][team_b] = Game { home_game: true, opponent: team_a as i32 };
+                    solution_matrix.solution[round][team_a] = Game {
+                        home_game: false,
+                        opponent: team_b as i32,
+                    };
+                    solution_matrix.solution[round][team_b] = Game {
+                        home_game: true,
+                        opponent: team_a as i32,
+                    };
                 }
 
                 info!(
-                "Pairing: Team {} vs Team {} | {} is home",
-                team_a,
-                team_b,
-                if home_first { team_a } else { team_b }
+                    "Pairing: Team {} vs Team {} | {} is home",
+                    team_a,
+                    team_b,
+                    if home_first { team_a } else { team_b }
                 );
-
             }
 
-            let fixed_team = teams.remove(teams.len()-1);
+            let fixed_team = teams.remove(teams.len() - 1);
             teams.rotate_right(1);
             teams.push(fixed_team);
             info!("Teams after rotation: {:?}", teams);
-
         }
 
-        info!("Final solution for {} teams | Fixed team: {} | Pattern: {}",
+        info!(
+            "Final solution for {} teams | Fixed team: {} | Pattern: {}",
             data.teams.len(),
             fixed_team,
-            if upward { "Upward direction" } else { "Downward direction" });
+            if upward {
+                "Upward direction"
+            } else {
+                "Downward direction"
+            }
+        );
 
         solution_matrix
     }
@@ -444,14 +769,24 @@ impl Solution {
 
         output.push_str(&format!("{:>8}", ""));
         for team_id in 0..data.teams.len() {
-            output.push_str(&format!("{:>8}", format!("{}:{}", data.teams[team_id].name, data.teams[team_id].id)));
+            output.push_str(&format!(
+                "{:>8}",
+                format!("{}:{}", data.teams[team_id].name, data.teams[team_id].id)
+            ));
         }
         output.push('\n');
 
         for (slot_id, row) in solution_matrix.solution.iter().enumerate() {
             output.push_str(&format!("{:>8}", format!("Slot:{}", slot_id)));
             for game in row {
-                output.push_str(&format!("{:>8}", format!("{}{}", game.opponent, if game.home_game { "H" } else { "A" })));
+                output.push_str(&format!(
+                    "{:>8}",
+                    format!(
+                        "{}{}",
+                        game.opponent,
+                        if game.home_game { "H" } else { "A" }
+                    )
+                ));
             }
             output.push('\n');
         }
@@ -487,7 +822,7 @@ impl Solution {
     /// let (cap_viol, sep_viol, rr_ok) = check_constraints(&data, &solution);
     /// println!("Capacity violations: {}, Separation violations: {}, Round-robin ok: {}", cap_viol, sep_viol, rr_ok);
     /// ```
-    fn check_constraints(data : &Rawdata, solution_matrix : &Solution) -> (i32,i32,bool) {
+    fn check_constraints(data: &Rawdata, solution_matrix: &Solution) -> (i32, i32, bool) {
         let num_slots = solution_matrix.solution.len();
         let num_teams = solution_matrix.solution[0].len();
         let mut capacity_constraints = 0;
@@ -499,7 +834,8 @@ impl Solution {
         for constraint in &data.capacity_constraints {
             for team in 0..num_teams {
                 for start_slot in 0..=num_slots - constraint.c_intp as usize {
-                    let count = solution_matrix.solution[start_slot..start_slot + constraint.c_intp as usize]
+                    let count = solution_matrix.solution
+                        [start_slot..start_slot + constraint.c_intp as usize]
                         .iter()
                         .filter(|slot| {
                             let game = &slot[team];
@@ -521,9 +857,7 @@ impl Solution {
         // Separation Constraints:
 
         for constraint in &data.separation_constraints {
-
             for team in 0..num_teams {
-
                 let mut last_slot_vs: Vec<Option<usize>> = vec![None; num_teams];
 
                 for slot in 0..num_slots {
@@ -533,7 +867,9 @@ impl Solution {
                     if let Some(last) = last_slot_vs[opponent] {
                         let distance = slot - last;
 
-                        if distance <= constraint.c_min as usize || distance > constraint.c_max as usize {
+                        if distance <= constraint.c_min as usize
+                            || distance > constraint.c_max as usize
+                        {
                             separation_constraints += 1;
                         }
                     }
@@ -567,7 +903,11 @@ impl Solution {
             }
         }
 
-        (capacity_constraints, separation_constraints, round_robin_respect)
+        (
+            capacity_constraints,
+            separation_constraints,
+            round_robin_respect,
+        )
     }
 
     /// Calculates the total traveling distance for all teams in a given solution.
@@ -591,7 +931,10 @@ impl Solution {
     /// let total = evaluate_objective(&distance_matrix, &solution);
     /// println!("Total traveling distance: {}", total);
     /// ```
-    fn evaluate_objective(traveling_distance_matrix : &Vec<Vec<i32>>, solution_matrix : &Solution) -> i32{
+    fn evaluate_objective(
+        traveling_distance_matrix: &Vec<Vec<i32>>,
+        solution_matrix: &Solution,
+    ) -> i32 {
         let num_slots = solution_matrix.solution.len();
         let num_teams = solution_matrix.solution[0].len();
         let mut total_distance = 0;
@@ -641,9 +984,19 @@ impl Solution {
     /// let solution = Solution::generate_example();
     /// let (total_distance, cap_viol, sep_viol, rr_ok) = evaluate_solution(&data, &distance_matrix, &solution);
     /// ```
-    pub fn evaluate_solution(data: &Rawdata, traveling_distance_matrix: &Vec<Vec<i32>>, solution_matrix: &Solution) -> (i32, i32, i32, bool) {
-        let (cap_constraints, sep_constraints, round_robin_respect) = Self::check_constraints(data, solution_matrix);
+    pub fn evaluate_solution(
+        data: &Rawdata,
+        traveling_distance_matrix: &Vec<Vec<i32>>,
+        solution_matrix: &Solution,
+    ) -> (i32, i32, i32, bool) {
+        let (cap_constraints, sep_constraints, round_robin_respect) =
+            Self::check_constraints(data, solution_matrix);
         let result = Self::evaluate_objective(traveling_distance_matrix, solution_matrix);
-        (result, cap_constraints, sep_constraints, round_robin_respect)
+        (
+            result,
+            cap_constraints,
+            sep_constraints,
+            round_robin_respect,
+        )
     }
 }

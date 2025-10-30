@@ -1,8 +1,11 @@
+// Std library
+use std::fs::OpenOptions;
+use std::io::Write;
+
+// External crates
 use chrono::Local;
 use env_logger::{Builder, Target};
 use log::{info, LevelFilter};
-use std::fs::OpenOptions;
-use std::io::Write;
 
 #[cfg(debug_assertions)]
 pub const LOGS_ENABLED: bool = true;

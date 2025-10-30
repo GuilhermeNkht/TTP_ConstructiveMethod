@@ -1,37 +1,40 @@
-/// All raw data parsed from the TTP XML file,
-/// including teams, slots, distances, and constraints.
+use serde::{Serialize, Deserialize};
 
-#[derive(Clone, Debug)]
+/// All raw data parsed from a TTP XML instance.
+///
+/// Contains all information necessary to generate solutions,
+/// including teams, slots, distances, and constraints.
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Rawdata {
-    /// The name of the instance.
+    /// Name of the instance.
     pub instance_name: String,
-    /// List of teams in the tournament.
+    /// List of teams participating in the tournament.
     pub teams: Vec<Team>,
     /// List of time slots or rounds.
     pub slots: Vec<Slot>,
-    /// List of distances between teams.
+    /// Pair travel distances between teams.
     pub distances: Vec<Distance>,
-    /// Capacity constraints.
+    /// Capacity constraints for the tournament.
     pub capacity_constraints: Vec<CapacityConstraints>,
-    /// Separation constraints.
+    /// Separation constraints for the tournament.
     pub separation_constraints: Vec<SeparationConstraints>,
 }
-impl Rawdata {}
 
 /// Represents the travel distance between two teams.
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq, Hash)]
 pub struct Distance {
-    /// Distance value.
+    /// Distance value between two teams.
     pub dist: i32,
-    /// First team.
+    /// First team ID.
     pub team1: i32,
-    /// Second team.
+    /// Second team ID.
     pub team2: i32,
 }
+
 impl Distance {
-    /// Creates a new Distance with default values.
-    pub fn new() -> Distance {
-        Distance {
+    /// Creates a new Distance with default values (0).
+    pub fn new() -> Self {
+        Self {
             dist: 0,
             team1: 0,
             team2: 0,
@@ -40,21 +43,22 @@ impl Distance {
 }
 
 /// Represents a team in the tournament.
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq, Hash)]
 pub struct Team {
-    /// Team ID.
+    /// Unique team ID.
     pub id: i32,
-    /// League ID or division.
+    /// League or division ID.
     pub league: i32,
     /// Name of the team.
     pub name: String,
     /// Team group or category.
     pub team_groups: i32,
 }
+
 impl Team {
     /// Creates a new Team with default values.
-    pub fn new() -> Team {
-        Team {
+    pub fn new() -> Self {
+        Self {
             id: 0,
             league: 0,
             name: "Null".to_string(),
@@ -64,7 +68,7 @@ impl Team {
 }
 
 /// Represents a time slot or round in the tournament.
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq, Hash)]
 pub struct Slot {
     /// Slot ID.
     pub id: i32,
@@ -74,8 +78,8 @@ pub struct Slot {
 
 impl Slot {
     /// Creates a new Slot with default values.
-    pub fn new() -> Slot {
-        Slot {
+    pub fn new() -> Self {
+        Self {
             id: 0,
             name: "Null".to_string(),
         }
@@ -83,31 +87,32 @@ impl Slot {
 }
 
 /// Represents capacity constraints for the tournament.
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct CapacityConstraints {
-    /// Internal parameter.
+    /// Interval parameter
     pub c_intp: i32,
-    /// Maximum value.
+    /// Maximum allowed occurrences.
     pub c_max: i32,
-    /// Minimum value.
+    /// Minimum required occurrences.
     pub c_min: i32,
-    /// Mode type 1 (single char).
+    /// Mode type 1 ('A', 'H').
     pub c_mode1: char,
     /// Mode type 2 (string).
     pub c_mode2: String,
-    /// Penalty value.
+    /// Penalty value for violation.
     pub c_penalty: i32,
-    /// First team group affected.
+    /// First affected team group.
     pub c_team_groups1: i32,
-    /// Second team group affected.
+    /// Second affected team group.
     pub c_team_groups2: i32,
-    /// Type of constraint.
+    /// Type of constraint (description).
     pub c_type: String,
 }
+
 impl CapacityConstraints {
     /// Creates a new CapacityConstraints instance with default values.
-    pub fn new() -> CapacityConstraints {
-        CapacityConstraints {
+    pub fn new() -> Self {
+        Self {
             c_intp: 0,
             c_max: 0,
             c_min: 0,
@@ -122,23 +127,24 @@ impl CapacityConstraints {
 }
 
 /// Represents separation constraints for the tournament.
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct SeparationConstraints {
-    /// Maximum value.
+    /// Maximum allowed distance between occurrences.
     pub c_max: i32,
-    /// Minimum value.
+    /// Minimum required distance between occurrences.
     pub c_min: i32,
-    /// Penalty value.
+    /// Penalty value for violation.
     pub c_penalty: i32,
     /// Team group affected by the constraint.
     pub c_team_groups: i32,
-    /// Type of constraint.
+    /// Type of constraint (description).
     pub c_type: String,
 }
+
 impl SeparationConstraints {
     /// Creates a new SeparationConstraints instance with default values.
-    pub fn new() -> SeparationConstraints {
-        SeparationConstraints {
+    pub fn new() -> Self {
+        Self {
             c_max: 0,
             c_min: 0,
             c_penalty: 0,
@@ -147,4 +153,3 @@ impl SeparationConstraints {
         }
     }
 }
-
