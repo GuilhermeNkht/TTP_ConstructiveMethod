@@ -31,7 +31,7 @@ The Traveling Tournament Problem (TTP) schedules a double round-robin tournament
 
 ---
 
-## Key Features
+## Features
 
 - Efficient generation of multiple valid schedules
 - Distance computation and statistical analysis
