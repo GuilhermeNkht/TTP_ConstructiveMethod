@@ -31,18 +31,6 @@ The Traveling Tournament Problem (TTP) schedules a double round-robin tournament
 
 ---
 
-## Methodology
-
-We adapted the Circle Method for single round-robin tournaments to systematically generate feasible double round-robin schedules.  
-By varying parameters such as the fixed team and home/away patterns, the algorithm can produce a diverse set of valid schedules — ideal for initializing evolutionary algorithms or other metaheuristics.
-
-### Time Complexity
-
-- Generate one valid schedule: O(n)  
-- Total possible schedules: up to 2n · n!
-
----
-
 ## Key Features
 
 - Efficient generation of multiple valid schedules
