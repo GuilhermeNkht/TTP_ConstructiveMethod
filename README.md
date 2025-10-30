@@ -68,6 +68,7 @@ The Traveling Tournament Problem (TTP) schedules a double round-robin tournament
 
 - Rust 1.70+
 - cargo for building and running
+- librust-yeslogic-fontconfig-sys-dev
 
 ### Installation
 
