@@ -105,7 +105,7 @@ After building, run the executable with:
 
 ### Example
 
-cargo run --release --package ttpgen --bin ttpgen --     --input NL12.xml     --output-solutions solutions     --output-permutations permutations     --permutations 10     --seed 31     --log     --save
+    cargo run --release --package ttpgen --bin ttpgen -- --input NL12.xml     --output-solutions solutions     --output-permutations permutations     --permutations 10     --seed 31     --log     --save
 
 <div align="center">
 <b>Output Example for NL8:</b><br><br>
