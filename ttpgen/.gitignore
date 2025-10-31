@@ -5,11 +5,9 @@
 
 /.idea/
 /*.iml
-/solutions
 
 *.log
 *.tmp
 *.swp
 *.swo
 .DS_Store
-log.txt

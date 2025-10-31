@@ -5,13 +5,7 @@ use std::io::Write;
 // External crates
 use chrono::Local;
 use env_logger::{Builder, Target};
-use log::{info, LevelFilter};
-
-#[cfg(debug_assertions)]
-pub const LOGS_ENABLED: bool = true;
-
-#[cfg(not(debug_assertions))]
-pub const LOGS_ENABLED: bool = false;
+use log::{LevelFilter};
 
 /// Initializes the logger to write messages to console and the file.
 ///
@@ -31,7 +25,11 @@ pub const LOGS_ENABLED: bool = false;
 /// init_logger("experiment.log");
 /// info!("Logger initialized!");
 /// ```
-pub fn init_logger(log_file: &str) {
+pub fn init_logger(log_file: &str, enable: bool) {
+    if !enable{
+        return;
+    }
+
     let file = OpenOptions::new()
         .create(true)
         .append(true)
@@ -39,13 +37,11 @@ pub fn init_logger(log_file: &str) {
         .unwrap();
 
     Builder::new()
-        .format(move |buf, record| {
+        .format(move |_buf, record| {
             let timestamp = Local::now().format("%H:%M:%S");
             let line = format!("[{}][{}] {}\n", timestamp, record.level(), record.args());
 
-            if LOGS_ENABLED {
-                print!("{}", line);
-            }
+            print!("{}", line);
 
             let mut f = &file;
             f.write_all(line.as_bytes()).unwrap();

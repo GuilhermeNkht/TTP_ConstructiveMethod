@@ -1,12 +1,11 @@
 // Std library
 use std::collections::{HashMap, HashSet};
 use std::fs::{self, File};
-use std::hash::{Hash, Hasher};
+use std::hash::{Hash};
 use std::io::BufReader;
 
 // External crates
 use indicatif::{ProgressBar, ProgressStyle};
-use itertools::Itertools;
 use log::info;
 use rand::SeedableRng;
 use rand::rngs::StdRng;
@@ -16,12 +15,6 @@ use serde_json::from_reader;
 
 // Local modules
 use crate::data_set::{Rawdata, Team};
-
-#[cfg(debug_assertions)]
-pub const SAVE_ENABLED: bool = true;
-
-#[cfg(not(debug_assertions))]
-pub const SAVE_ENABLED: bool = true;
 
 /// Saves any serializable data to a json file.
 ///
@@ -160,11 +153,13 @@ impl ProgressBarLog {
         self.bar.inc(1);
     }
 
+    #[allow(dead_code)]
     /// Finishes the progress bar, marking it as complete.
     pub fn finish(&self) {
         self.bar.finish();
     }
 
+    #[allow(dead_code)]
     /// Sets a custom message to display alongside the progress bar.
     ///
     /// # Arguments
@@ -276,6 +271,7 @@ impl Solution {
         traveling_distance_matrix
     }
 
+    #[allow(dead_code)]
     /// Checks if a list of `Solution` objects contains duplicates.
     ///
     /// This function iterates over all solutions and attempts to insert each one into a
@@ -314,6 +310,7 @@ impl Solution {
         false
     }
 
+    #[allow(dead_code)]
     /// Loads all solution files from a directory and returns them as a vector of `Solution`.
     ///
     /// This function scans the directory for files whose names follow the pattern
@@ -370,6 +367,7 @@ impl Solution {
         all_solutions
     }
 
+    #[allow(dead_code)]
     /// Calculates the total traveling distances for a list of solutions.
     ///
     /// This function iterates over each solution, evaluates it using the provided
@@ -510,7 +508,7 @@ impl Solution {
         data: &Rawdata,
         number_permutations: i32,
         seed: u64,
-        path: &str,
+        path: &str, save: bool,
     ) -> Vec<Vec<i32>> {
         let team_ids: Vec<i32> = data.teams.iter().map(|t| t.id).collect();
 
@@ -525,7 +523,7 @@ impl Solution {
 
         let vec_perm: Vec<Vec<i32>> = permutations.into_iter().collect();
 
-        if SAVE_ENABLED {
+        if save {
             let permutations_to_save = Permutations {
                 seed,
                 instance_name: data.instance_name.clone(),
@@ -573,6 +571,7 @@ impl Solution {
         traveling_distance_matrix: &Vec<Vec<i32>>,
         permutation: Vec<Vec<i32>>,
         path: &str,
+        save: bool,
     ) -> (Vec<Solution>, Vec<i128>) {
         let mut solutions: Vec<Solution> = Vec::new();
         let mut all_distances: Vec<i128> = Vec::new();
@@ -619,7 +618,7 @@ impl Solution {
                     all_distances.push(distance_solution as i128);
 
                     // Save to file
-                    if (SAVE_ENABLED) {
+                    if save {
                         save_to_file(
                             &temporary_solution,
                             &format!("{}/solution_{}.json", path, id_solution),

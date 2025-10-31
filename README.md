@@ -29,36 +29,43 @@ The Traveling Tournament Problem (TTP) schedules a double round-robin tournament
 2. No Repeats (noRepeat) – Teams cannot face the same opponent in consecutive rounds.  
 3. Double Round-Robin (doubleRoundRobin) – Each team plays only one game per round.
 
+<div align="center">
+<b>Example:</b><br>
+<img src="ttpgen/images/ttp.png" alt="Traveling Tournament Problem (TTP)" width="400"/><br>
+<i>Figure 1:</i> Left: A valid 4-team TTP tournament. Right: An invalid TTP tournament, with a `noRepeat` violation in column 2, a `maxStreak = 3` violation in column 4, and `doubleRoundRobin` violations in rounds (rows) 2, 3, and 4.
+</div>
+
 ---
 
 ## Features
 
-- Efficient generation of multiple valid schedules
-- Distance computation and statistical analysis
-- Save and load solutions/permutations in JSON format
-- Easy integration with metaheuristic initialization pipelines
-- Optional visualizations (distance histograms)
-- Fully reproducible (fixed random seeds)
+- Efficient generation of multiple valid schedules.
+- Distance computation and statistical analysis.
+- Save and load solutions/permutations in JSON format.
+- Easy integration with metaheuristic initialization pipelines.
+- Optional visualizations (distance histograms).
+- Fully reproducible (fixed random seeds).
 
 ---
 
 ## Technical Stack
 
-| Component | Description |
-|------------|-------------|
-| **Language** | Rust |
+| Component | Description                               |
+|------------|-------------------------------------------|
+| **Language** | Rust                                      |
 | **Core Algorithm** | Constructive scheduling via Circle Method |
-| **Libraries** | |
-|  • roxmltree = "0.20.0" | XML parsing |
-|  • log = "0.4.28" | Logging framework |
-|  • env_logger = "0.11.8" | Environment-based logger |
-|  • chrono = "0.4.42" | Date and time utilities |
-|  • itertools = "0.14.0" | Advanced iteration/combinatorics tools |
-|  • serde = "1.0.228" | Serialization and deserialization |
-|  • serde_json = "1.0.145" | JSON handling |
-|  • indicatif = "0.9.0" | Progress bars for CLI |
-|  • plotters = "0.3.7" | Plotting and visualization |
-|  • rand = "0.9.2" | Random number generation |
+| **Libraries** |                                           |
+|  • roxmltree = "0.20.0" | XML parsing                               |
+|  • log = "0.4.28" | Logging framework                         |
+|  • env_logger = "0.11.8" | Environment-based logger                  |
+|  • chrono = "0.4.42" | Date and time utilities                   |
+|  • itertools = "0.14.0" | Advanced iteration/combinatorics tools    |
+|  • serde = "1.0.228" | Serialization and deserialization         |
+|  • serde_json = "1.0.145" | JSON handling                             |
+|  • indicatif = "0.9.0" | Progress bars for CLI                     |
+|  • plotters = "0.3.7" | Plotting and visualization                |
+|  • rand = "0.9.2" | Random number generation                  |
+|  • clap = "4.5.51" | Cli Interface / Comand line argument      |
 
 ---
 
@@ -72,7 +79,7 @@ The Traveling Tournament Problem (TTP) schedules a double round-robin tournament
 
 ### Installation
 
-    git clone <repository_url>
+    git clone <https://github.com/GuilhermeNkht/TTP_ConstructiveMethod>
     cd ttpgen
     cargo build --release
 
@@ -86,23 +93,37 @@ After building, run the executable with:
 
 ### Command-line Options
 
-
-TODO:
-//--input <file> : Path to the XML instance file  
-//--output-solutions <folder> : Directory to save generated solutions  
-//--output-permutations <folder> : Directory to save generated permutations  
-//--permutations <n> : Number of random team permutations to generate  
-//--seed <n> : Random seed for reproducibility  
-//--no-save : Disable saving solutions to disk  
-//--log <true|false> : Enable or disable logging
+--input <file> : Path to the XML instance file  
+--output-solutions <folder> : Directory to save generated solutions  
+--output-permutations <folder> : Directory to save generated permutations  
+--permutations <n> : Number of random team permutations to generate  
+--seed <n> : Random seed for reproducibility  
+--log : Enable or disable logging
+--save : Enable or disable saving to disk  
 
 ---
 
 ### Example
 
-TODO:
-//cargo run --release --package ttpgen --bin ttpgen --   --input NL12.xml   --output-solutions output --output-permutations output --permutations 10   --seed 42
-//This command generates 10 random solutions using the constructive method, evaluates their total travel distances, and saves them to the output/ folder.
+cargo run --release --package ttpgen --bin ttpgen --     --input NL12.xml     --output-solutions solutions     --output-permutations permutations     --permutations 10     --seed 31     --log     --save
+
+<div align="center">
+<b>Output Example for NL8:</b><br><br>
+
+<b>1. Example of permutation (JSON):</b>  
+[outputs/permutations/perms.json](ttpgen/permutations/permutation.json)<br><br>
+
+<b>2. Example of solution (JSON):</b>  
+[outputs/solutions/solutions_1.json](ttpgen/solutions/solution_1.json)<br><br>
+
+<b>3. Example of final print in log:</b>  
+[outputs/log.txt](ttpgen/log.txt)<br><br>
+
+<b>4. Example of final histogram:</b>  
+[outputs/dist_histogram.png](ttpgen/images/dist_histogram.png)<br>
+</div>
+
+
 
 ---
 
