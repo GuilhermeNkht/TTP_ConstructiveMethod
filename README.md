@@ -126,7 +126,7 @@ After building, run the executable with:
 
 ### Documentation
 
-The full API documentation for this project can be found here: [View generated documentation](https://guilhermenkht.github.io/TTP_ConstructiveMethod/ttpgen/index.html)
+The full API documentation for this project can be found here: [View documentation](https://guilhermenkht.github.io/TTP_ConstructiveMethod/)
 
 ---
 
