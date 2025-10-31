@@ -124,6 +124,9 @@ After building, run the executable with:
 </div>
 
 
+### Documentation
+
+The full API documentation for this project can be found here: [View generated documentation](https://guilhermenkht.github.io/TTP_ConstructiveMethod/ttpgen/index.html)
 
 ---
 
