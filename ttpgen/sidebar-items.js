@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["main"],"mod":["cli","data_set","logging","solution","statistics","xml_manager"]};

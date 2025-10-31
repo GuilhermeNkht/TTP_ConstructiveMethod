@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"struct":["CapacityConstraints","Distance","Rawdata","SeparationConstraints","Slot","Team"]};
