@@ -4,22 +4,72 @@
     [
       {
         "home_game": false,
-        "opponent": 4
+        "opponent": 8
       },
       {
         "home_game": false,
-        "opponent": 7
+        "opponent": 9
       },
       {
         "home_game": true,
-        "opponent": 3
+        "opponent": 6
+      },
+      {
+        "home_game": false,
+        "opponent": 10
+      },
+      {
+        "home_game": true,
+        "opponent": 5
+      },
+      {
+        "home_game": false,
+        "opponent": 4
       },
       {
         "home_game": false,
         "opponent": 2
       },
       {
+        "home_game": false,
+        "opponent": 11
+      },
+      {
         "home_game": true,
+        "opponent": 0
+      },
+      {
+        "home_game": true,
+        "opponent": 1
+      },
+      {
+        "home_game": true,
+        "opponent": 3
+      },
+      {
+        "home_game": true,
+        "opponent": 7
+      }
+    ],
+    [
+      {
+        "home_game": true,
+        "opponent": 4
+      },
+      {
+        "home_game": true,
+        "opponent": 2
+      },
+      {
+        "home_game": false,
+        "opponent": 1
+      },
+      {
+        "home_game": true,
+        "opponent": 9
+      },
+      {
+        "home_game": false,
         "opponent": 0
       },
       {
@@ -32,7 +82,823 @@
       },
       {
         "home_game": true,
+        "opponent": 8
+      },
+      {
+        "home_game": false,
+        "opponent": 7
+      },
+      {
+        "home_game": false,
+        "opponent": 3
+      },
+      {
+        "home_game": true,
+        "opponent": 11
+      },
+      {
+        "home_game": false,
+        "opponent": 10
+      }
+    ],
+    [
+      {
+        "home_game": true,
+        "opponent": 5
+      },
+      {
+        "home_game": false,
+        "opponent": 6
+      },
+      {
+        "home_game": true,
+        "opponent": 3
+      },
+      {
+        "home_game": false,
+        "opponent": 2
+      },
+      {
+        "home_game": true,
+        "opponent": 7
+      },
+      {
+        "home_game": false,
+        "opponent": 0
+      },
+      {
+        "home_game": true,
         "opponent": 1
+      },
+      {
+        "home_game": false,
+        "opponent": 4
+      },
+      {
+        "home_game": true,
+        "opponent": 10
+      },
+      {
+        "home_game": true,
+        "opponent": 11
+      },
+      {
+        "home_game": false,
+        "opponent": 8
+      },
+      {
+        "home_game": false,
+        "opponent": 9
+      }
+    ],
+    [
+      {
+        "home_game": false,
+        "opponent": 7
+      },
+      {
+        "home_game": false,
+        "opponent": 5
+      },
+      {
+        "home_game": false,
+        "opponent": 11
+      },
+      {
+        "home_game": true,
+        "opponent": 6
+      },
+      {
+        "home_game": false,
+        "opponent": 10
+      },
+      {
+        "home_game": true,
+        "opponent": 1
+      },
+      {
+        "home_game": false,
+        "opponent": 3
+      },
+      {
+        "home_game": true,
+        "opponent": 0
+      },
+      {
+        "home_game": false,
+        "opponent": 9
+      },
+      {
+        "home_game": true,
+        "opponent": 8
+      },
+      {
+        "home_game": true,
+        "opponent": 4
+      },
+      {
+        "home_game": true,
+        "opponent": 2
+      }
+    ],
+    [
+      {
+        "home_game": true,
+        "opponent": 10
+      },
+      {
+        "home_game": true,
+        "opponent": 3
+      },
+      {
+        "home_game": true,
+        "opponent": 8
+      },
+      {
+        "home_game": false,
+        "opponent": 1
+      },
+      {
+        "home_game": true,
+        "opponent": 9
+      },
+      {
+        "home_game": false,
+        "opponent": 7
+      },
+      {
+        "home_game": true,
+        "opponent": 11
+      },
+      {
+        "home_game": true,
+        "opponent": 5
+      },
+      {
+        "home_game": false,
+        "opponent": 2
+      },
+      {
+        "home_game": false,
+        "opponent": 4
+      },
+      {
+        "home_game": false,
+        "opponent": 0
+      },
+      {
+        "home_game": false,
+        "opponent": 6
+      }
+    ],
+    [
+      {
+        "home_game": false,
+        "opponent": 9
+      },
+      {
+        "home_game": false,
+        "opponent": 11
+      },
+      {
+        "home_game": true,
+        "opponent": 4
+      },
+      {
+        "home_game": false,
+        "opponent": 5
+      },
+      {
+        "home_game": false,
+        "opponent": 2
+      },
+      {
+        "home_game": true,
+        "opponent": 3
+      },
+      {
+        "home_game": false,
+        "opponent": 8
+      },
+      {
+        "home_game": false,
+        "opponent": 10
+      },
+      {
+        "home_game": true,
+        "opponent": 6
+      },
+      {
+        "home_game": true,
+        "opponent": 0
+      },
+      {
+        "home_game": true,
+        "opponent": 7
+      },
+      {
+        "home_game": true,
+        "opponent": 1
+      }
+    ],
+    [
+      {
+        "home_game": true,
+        "opponent": 2
+      },
+      {
+        "home_game": true,
+        "opponent": 8
+      },
+      {
+        "home_game": false,
+        "opponent": 0
+      },
+      {
+        "home_game": true,
+        "opponent": 11
+      },
+      {
+        "home_game": false,
+        "opponent": 6
+      },
+      {
+        "home_game": false,
+        "opponent": 10
+      },
+      {
+        "home_game": true,
+        "opponent": 4
+      },
+      {
+        "home_game": true,
+        "opponent": 9
+      },
+      {
+        "home_game": false,
+        "opponent": 1
+      },
+      {
+        "home_game": false,
+        "opponent": 7
+      },
+      {
+        "home_game": true,
+        "opponent": 5
+      },
+      {
+        "home_game": false,
+        "opponent": 3
+      }
+    ],
+    [
+      {
+        "home_game": false,
+        "opponent": 6
+      },
+      {
+        "home_game": false,
+        "opponent": 4
+      },
+      {
+        "home_game": true,
+        "opponent": 7
+      },
+      {
+        "home_game": false,
+        "opponent": 8
+      },
+      {
+        "home_game": true,
+        "opponent": 1
+      },
+      {
+        "home_game": true,
+        "opponent": 11
+      },
+      {
+        "home_game": true,
+        "opponent": 0
+      },
+      {
+        "home_game": false,
+        "opponent": 2
+      },
+      {
+        "home_game": true,
+        "opponent": 3
+      },
+      {
+        "home_game": true,
+        "opponent": 10
+      },
+      {
+        "home_game": false,
+        "opponent": 9
+      },
+      {
+        "home_game": false,
+        "opponent": 5
+      }
+    ],
+    [
+      {
+        "home_game": false,
+        "opponent": 1
+      },
+      {
+        "home_game": true,
+        "opponent": 0
+      },
+      {
+        "home_game": false,
+        "opponent": 10
+      },
+      {
+        "home_game": true,
+        "opponent": 4
+      },
+      {
+        "home_game": false,
+        "opponent": 3
+      },
+      {
+        "home_game": false,
+        "opponent": 9
+      },
+      {
+        "home_game": false,
+        "opponent": 7
+      },
+      {
+        "home_game": true,
+        "opponent": 6
+      },
+      {
+        "home_game": false,
+        "opponent": 11
+      },
+      {
+        "home_game": true,
+        "opponent": 5
+      },
+      {
+        "home_game": true,
+        "opponent": 2
+      },
+      {
+        "home_game": true,
+        "opponent": 8
+      }
+    ],
+    [
+      {
+        "home_game": true,
+        "opponent": 3
+      },
+      {
+        "home_game": true,
+        "opponent": 7
+      },
+      {
+        "home_game": true,
+        "opponent": 9
+      },
+      {
+        "home_game": false,
+        "opponent": 0
+      },
+      {
+        "home_game": true,
+        "opponent": 11
+      },
+      {
+        "home_game": true,
+        "opponent": 8
+      },
+      {
+        "home_game": true,
+        "opponent": 10
+      },
+      {
+        "home_game": false,
+        "opponent": 1
+      },
+      {
+        "home_game": false,
+        "opponent": 5
+      },
+      {
+        "home_game": false,
+        "opponent": 2
+      },
+      {
+        "home_game": false,
+        "opponent": 6
+      },
+      {
+        "home_game": false,
+        "opponent": 4
+      }
+    ],
+    [
+      {
+        "home_game": false,
+        "opponent": 11
+      },
+      {
+        "home_game": false,
+        "opponent": 10
+      },
+      {
+        "home_game": true,
+        "opponent": 5
+      },
+      {
+        "home_game": true,
+        "opponent": 7
+      },
+      {
+        "home_game": false,
+        "opponent": 8
+      },
+      {
+        "home_game": false,
+        "opponent": 2
+      },
+      {
+        "home_game": false,
+        "opponent": 9
+      },
+      {
+        "home_game": false,
+        "opponent": 3
+      },
+      {
+        "home_game": true,
+        "opponent": 4
+      },
+      {
+        "home_game": true,
+        "opponent": 6
+      },
+      {
+        "home_game": true,
+        "opponent": 1
+      },
+      {
+        "home_game": true,
+        "opponent": 0
+      }
+    ],
+    [
+      {
+        "home_game": true,
+        "opponent": 8
+      },
+      {
+        "home_game": true,
+        "opponent": 9
+      },
+      {
+        "home_game": false,
+        "opponent": 6
+      },
+      {
+        "home_game": true,
+        "opponent": 10
+      },
+      {
+        "home_game": false,
+        "opponent": 5
+      },
+      {
+        "home_game": true,
+        "opponent": 4
+      },
+      {
+        "home_game": true,
+        "opponent": 2
+      },
+      {
+        "home_game": true,
+        "opponent": 11
+      },
+      {
+        "home_game": false,
+        "opponent": 0
+      },
+      {
+        "home_game": false,
+        "opponent": 1
+      },
+      {
+        "home_game": false,
+        "opponent": 3
+      },
+      {
+        "home_game": false,
+        "opponent": 7
+      }
+    ],
+    [
+      {
+        "home_game": false,
+        "opponent": 4
+      },
+      {
+        "home_game": false,
+        "opponent": 2
+      },
+      {
+        "home_game": true,
+        "opponent": 1
+      },
+      {
+        "home_game": false,
+        "opponent": 9
+      },
+      {
+        "home_game": true,
+        "opponent": 0
+      },
+      {
+        "home_game": false,
+        "opponent": 6
+      },
+      {
+        "home_game": true,
+        "opponent": 5
+      },
+      {
+        "home_game": false,
+        "opponent": 8
+      },
+      {
+        "home_game": true,
+        "opponent": 7
+      },
+      {
+        "home_game": true,
+        "opponent": 3
+      },
+      {
+        "home_game": false,
+        "opponent": 11
+      },
+      {
+        "home_game": true,
+        "opponent": 10
+      }
+    ],
+    [
+      {
+        "home_game": false,
+        "opponent": 5
+      },
+      {
+        "home_game": true,
+        "opponent": 6
+      },
+      {
+        "home_game": false,
+        "opponent": 3
+      },
+      {
+        "home_game": true,
+        "opponent": 2
+      },
+      {
+        "home_game": false,
+        "opponent": 7
+      },
+      {
+        "home_game": true,
+        "opponent": 0
+      },
+      {
+        "home_game": false,
+        "opponent": 1
+      },
+      {
+        "home_game": true,
+        "opponent": 4
+      },
+      {
+        "home_game": false,
+        "opponent": 10
+      },
+      {
+        "home_game": false,
+        "opponent": 11
+      },
+      {
+        "home_game": true,
+        "opponent": 8
+      },
+      {
+        "home_game": true,
+        "opponent": 9
+      }
+    ],
+    [
+      {
+        "home_game": true,
+        "opponent": 7
+      },
+      {
+        "home_game": true,
+        "opponent": 5
+      },
+      {
+        "home_game": true,
+        "opponent": 11
+      },
+      {
+        "home_game": false,
+        "opponent": 6
+      },
+      {
+        "home_game": true,
+        "opponent": 10
+      },
+      {
+        "home_game": false,
+        "opponent": 1
+      },
+      {
+        "home_game": true,
+        "opponent": 3
+      },
+      {
+        "home_game": false,
+        "opponent": 0
+      },
+      {
+        "home_game": true,
+        "opponent": 9
+      },
+      {
+        "home_game": false,
+        "opponent": 8
+      },
+      {
+        "home_game": false,
+        "opponent": 4
+      },
+      {
+        "home_game": false,
+        "opponent": 2
+      }
+    ],
+    [
+      {
+        "home_game": false,
+        "opponent": 10
+      },
+      {
+        "home_game": false,
+        "opponent": 3
+      },
+      {
+        "home_game": false,
+        "opponent": 8
+      },
+      {
+        "home_game": true,
+        "opponent": 1
+      },
+      {
+        "home_game": false,
+        "opponent": 9
+      },
+      {
+        "home_game": true,
+        "opponent": 7
+      },
+      {
+        "home_game": false,
+        "opponent": 11
+      },
+      {
+        "home_game": false,
+        "opponent": 5
+      },
+      {
+        "home_game": true,
+        "opponent": 2
+      },
+      {
+        "home_game": true,
+        "opponent": 4
+      },
+      {
+        "home_game": true,
+        "opponent": 0
+      },
+      {
+        "home_game": true,
+        "opponent": 6
+      }
+    ],
+    [
+      {
+        "home_game": true,
+        "opponent": 9
+      },
+      {
+        "home_game": true,
+        "opponent": 11
+      },
+      {
+        "home_game": false,
+        "opponent": 4
+      },
+      {
+        "home_game": true,
+        "opponent": 5
+      },
+      {
+        "home_game": true,
+        "opponent": 2
+      },
+      {
+        "home_game": false,
+        "opponent": 3
+      },
+      {
+        "home_game": true,
+        "opponent": 8
+      },
+      {
+        "home_game": true,
+        "opponent": 10
+      },
+      {
+        "home_game": false,
+        "opponent": 6
+      },
+      {
+        "home_game": false,
+        "opponent": 0
+      },
+      {
+        "home_game": false,
+        "opponent": 7
+      },
+      {
+        "home_game": false,
+        "opponent": 1
+      }
+    ],
+    [
+      {
+        "home_game": false,
+        "opponent": 2
+      },
+      {
+        "home_game": false,
+        "opponent": 8
+      },
+      {
+        "home_game": true,
+        "opponent": 0
+      },
+      {
+        "home_game": false,
+        "opponent": 11
+      },
+      {
+        "home_game": true,
+        "opponent": 6
+      },
+      {
+        "home_game": true,
+        "opponent": 10
+      },
+      {
+        "home_game": false,
+        "opponent": 4
+      },
+      {
+        "home_game": false,
+        "opponent": 9
+      },
+      {
+        "home_game": true,
+        "opponent": 1
+      },
+      {
+        "home_game": true,
+        "opponent": 7
+      },
+      {
+        "home_game": false,
+        "opponent": 5
+      },
+      {
+        "home_game": true,
+        "opponent": 3
       }
     ],
     [
@@ -45,12 +911,12 @@
         "opponent": 4
       },
       {
-        "home_game": true,
+        "home_game": false,
         "opponent": 7
       },
       {
         "home_game": true,
-        "opponent": 5
+        "opponent": 8
       },
       {
         "home_game": false,
@@ -58,60 +924,34 @@
       },
       {
         "home_game": false,
-        "opponent": 3
+        "opponent": 11
       },
       {
         "home_game": false,
         "opponent": 0
       },
       {
-        "home_game": false,
-        "opponent": 2
-      }
-    ],
-    [
-      {
-        "home_game": false,
-        "opponent": 1
-      },
-      {
-        "home_game": true,
-        "opponent": 0
-      },
-      {
-        "home_game": false,
-        "opponent": 4
-      },
-      {
-        "home_game": false,
-        "opponent": 6
-      },
-      {
         "home_game": true,
         "opponent": 2
       },
       {
-        "home_game": true,
-        "opponent": 7
-      },
-      {
-        "home_game": true,
+        "home_game": false,
         "opponent": 3
       },
       {
         "home_game": false,
+        "opponent": 10
+      },
+      {
+        "home_game": true,
+        "opponent": 9
+      },
+      {
+        "home_game": true,
         "opponent": 5
       }
     ],
     [
-      {
-        "home_game": true,
-        "opponent": 3
-      },
-      {
-        "home_game": false,
-        "opponent": 2
-      },
       {
         "home_game": true,
         "opponent": 1
@@ -121,68 +961,8 @@
         "opponent": 0
       },
       {
-        "home_game": false,
-        "opponent": 5
-      },
-      {
         "home_game": true,
-        "opponent": 4
-      },
-      {
-        "home_game": false,
-        "opponent": 7
-      },
-      {
-        "home_game": true,
-        "opponent": 6
-      }
-    ],
-    [
-      {
-        "home_game": false,
-        "opponent": 2
-      },
-      {
-        "home_game": true,
-        "opponent": 5
-      },
-      {
-        "home_game": true,
-        "opponent": 0
-      },
-      {
-        "home_game": true,
-        "opponent": 7
-      },
-      {
-        "home_game": false,
-        "opponent": 6
-      },
-      {
-        "home_game": false,
-        "opponent": 1
-      },
-      {
-        "home_game": true,
-        "opponent": 4
-      },
-      {
-        "home_game": false,
-        "opponent": 3
-      }
-    ],
-    [
-      {
-        "home_game": true,
-        "opponent": 7
-      },
-      {
-        "home_game": false,
-        "opponent": 6
-      },
-      {
-        "home_game": false,
-        "opponent": 5
+        "opponent": 10
       },
       {
         "home_game": false,
@@ -194,37 +974,45 @@
       },
       {
         "home_game": true,
-        "opponent": 2
+        "opponent": 9
       },
       {
         "home_game": true,
-        "opponent": 1
+        "opponent": 7
       },
       {
         "home_game": false,
-        "opponent": 0
-      }
-    ],
-    [
+        "opponent": 6
+      },
+      {
+        "home_game": true,
+        "opponent": 11
+      },
       {
         "home_game": false,
         "opponent": 5
       },
       {
         "home_game": false,
+        "opponent": 2
+      },
+      {
+        "home_game": false,
+        "opponent": 8
+      }
+    ],
+    [
+      {
+        "home_game": false,
         "opponent": 3
-      },
-      {
-        "home_game": true,
-        "opponent": 6
-      },
-      {
-        "home_game": true,
-        "opponent": 1
       },
       {
         "home_game": false,
         "opponent": 7
+      },
+      {
+        "home_game": false,
+        "opponent": 9
       },
       {
         "home_game": true,
@@ -232,7 +1020,31 @@
       },
       {
         "home_game": false,
+        "opponent": 11
+      },
+      {
+        "home_game": false,
+        "opponent": 8
+      },
+      {
+        "home_game": false,
+        "opponent": 10
+      },
+      {
+        "home_game": true,
+        "opponent": 1
+      },
+      {
+        "home_game": true,
+        "opponent": 5
+      },
+      {
+        "home_game": true,
         "opponent": 2
+      },
+      {
+        "home_game": true,
+        "opponent": 6
       },
       {
         "home_game": true,
@@ -242,151 +1054,15 @@
     [
       {
         "home_game": true,
-        "opponent": 4
+        "opponent": 11
       },
       {
         "home_game": true,
-        "opponent": 7
-      },
-      {
-        "home_game": false,
-        "opponent": 3
-      },
-      {
-        "home_game": true,
-        "opponent": 2
-      },
-      {
-        "home_game": false,
-        "opponent": 0
-      },
-      {
-        "home_game": false,
-        "opponent": 6
-      },
-      {
-        "home_game": true,
-        "opponent": 5
-      },
-      {
-        "home_game": false,
-        "opponent": 1
-      }
-    ],
-    [
-      {
-        "home_game": false,
-        "opponent": 6
-      },
-      {
-        "home_game": false,
-        "opponent": 4
-      },
-      {
-        "home_game": false,
-        "opponent": 7
+        "opponent": 10
       },
       {
         "home_game": false,
         "opponent": 5
-      },
-      {
-        "home_game": true,
-        "opponent": 1
-      },
-      {
-        "home_game": true,
-        "opponent": 3
-      },
-      {
-        "home_game": true,
-        "opponent": 0
-      },
-      {
-        "home_game": true,
-        "opponent": 2
-      }
-    ],
-    [
-      {
-        "home_game": true,
-        "opponent": 1
-      },
-      {
-        "home_game": false,
-        "opponent": 0
-      },
-      {
-        "home_game": true,
-        "opponent": 4
-      },
-      {
-        "home_game": true,
-        "opponent": 6
-      },
-      {
-        "home_game": false,
-        "opponent": 2
-      },
-      {
-        "home_game": false,
-        "opponent": 7
-      },
-      {
-        "home_game": false,
-        "opponent": 3
-      },
-      {
-        "home_game": true,
-        "opponent": 5
-      }
-    ],
-    [
-      {
-        "home_game": false,
-        "opponent": 3
-      },
-      {
-        "home_game": true,
-        "opponent": 2
-      },
-      {
-        "home_game": false,
-        "opponent": 1
-      },
-      {
-        "home_game": true,
-        "opponent": 0
-      },
-      {
-        "home_game": true,
-        "opponent": 5
-      },
-      {
-        "home_game": false,
-        "opponent": 4
-      },
-      {
-        "home_game": true,
-        "opponent": 7
-      },
-      {
-        "home_game": false,
-        "opponent": 6
-      }
-    ],
-    [
-      {
-        "home_game": true,
-        "opponent": 2
-      },
-      {
-        "home_game": false,
-        "opponent": 5
-      },
-      {
-        "home_game": false,
-        "opponent": 0
       },
       {
         "home_game": false,
@@ -394,63 +1070,23 @@
       },
       {
         "home_game": true,
-        "opponent": 6
+        "opponent": 8
       },
       {
         "home_game": true,
-        "opponent": 1
-      },
-      {
-        "home_game": false,
-        "opponent": 4
-      },
-      {
-        "home_game": true,
-        "opponent": 3
-      }
-    ],
-    [
-      {
-        "home_game": false,
-        "opponent": 7
-      },
-      {
-        "home_game": true,
-        "opponent": 6
-      },
-      {
-        "home_game": true,
-        "opponent": 5
-      },
-      {
-        "home_game": true,
-        "opponent": 4
-      },
-      {
-        "home_game": false,
-        "opponent": 3
-      },
-      {
-        "home_game": false,
         "opponent": 2
       },
       {
-        "home_game": false,
-        "opponent": 1
-      },
-      {
         "home_game": true,
-        "opponent": 0
-      }
-    ],
-    [
-      {
-        "home_game": true,
-        "opponent": 5
+        "opponent": 9
       },
       {
         "home_game": true,
         "opponent": 3
+      },
+      {
+        "home_game": false,
+        "opponent": 4
       },
       {
         "home_game": false,
@@ -461,20 +1097,8 @@
         "opponent": 1
       },
       {
-        "home_game": true,
-        "opponent": 7
-      },
-      {
         "home_game": false,
         "opponent": 0
-      },
-      {
-        "home_game": true,
-        "opponent": 2
-      },
-      {
-        "home_game": false,
-        "opponent": 4
       }
     ]
   ]
