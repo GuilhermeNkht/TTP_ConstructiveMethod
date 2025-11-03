@@ -183,9 +183,9 @@ impl Statistics{
     /// let distances = vec![10, 20, 20, 30, 40, 40, 40, 50];
     /// Statistics::plot_histogram(&distances, "output/histogram.png");
     /// ```
-    pub fn plot_histogram(distances: &Vec<i128>, filename: &str) {
-        let min = *distances.iter().min().unwrap();
-        let max = *distances.iter().max().unwrap();
+    pub fn plot_histogram(data: &Vec<i128>, filename: &str) {
+        let min = *data.iter().min().unwrap();
+        let max = *data.iter().max().unwrap();
 
         let root = BitMapBackend::new(filename, (1280, 720))
             .into_drawing_area();
@@ -200,7 +200,7 @@ impl Statistics{
             let start = min + b * step;
             let end = start + step;
 
-            let count = distances.iter().filter(|&&v| v >= start && v < end).count() as i128;
+            let count = data.iter().filter(|&&v| v >= start && v < end).count() as i128;
             counts.push(count);
         }
 
@@ -237,7 +237,7 @@ impl Statistics{
     /// let distances = vec![10, 20, 30, 40, 50];
     /// Statistics::generate_statistics(&distances);
     /// ```
-    pub fn generate_statistics(distances: &Vec<i128>) {
+    pub fn generate_statistics(distances: &Vec<i128>){
 
         info!("Mean: {}", Statistics::mean(&distances));
         info!("Median: {}", Statistics::median(&distances));
@@ -247,6 +247,7 @@ impl Statistics{
         info!("Quartiles: {:?}", Statistics::quartiles(&distances));
 
         Statistics::plot_histogram(&distances, "dist_histogram.png");
+
     }
 
 }

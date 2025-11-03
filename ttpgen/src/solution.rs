@@ -12,6 +12,7 @@ use rand::rngs::StdRng;
 use rand::seq::SliceRandom;
 use serde::{Deserialize, Serialize};
 use serde_json::from_reader;
+use std::io::Write;
 
 // Local modules
 use crate::data_set::{Rawdata, Team};
@@ -350,7 +351,7 @@ impl Solution {
 
             if path.is_file() {
                 if let Some(filename) = path.file_name().and_then(|n| n.to_str()) {
-                    if filename.starts_with("solutions_") && filename.ends_with(".json") {
+                    if filename.starts_with("solution_") && filename.ends_with(".json") {
                         let file = File::open(&path).expect("Error opening file");
                         let reader = BufReader::new(file);
 
@@ -406,6 +407,42 @@ impl Solution {
         }
 
         all_distances
+    }
+
+    /// Save travel distances to a CSV file for external statistical
+    ///
+    /// This function exports the list of travel distances by to a `.csv` file.
+    /// These values can be analyzed in external tools such as Python, R, MATLAB, Pandas,
+    /// NumPy, SciPy, or statistical libraries.
+    ///
+    /// # Parameters
+    /// - `distances`: A vector of i128 values containing the total travel
+    ///   distance of each generated valid schedule.
+    /// - `filename`: Path to the CSV file to be created.
+    ///
+    /// # Output Format
+    /// The CSV file will contain one distance per line:
+    ///
+    /// ```csv
+    /// distance
+    /// 59221
+    /// 60012
+    /// 58890
+    /// ...
+    /// ```
+    ///
+    /// # Example
+    /// ```rust
+    /// Statistics::save_distances_to_csv(&distances, "nl8_distances.csv").unwrap();
+    /// ```
+    pub fn save_distances_to_csv(distances: &Vec<i128>, filename: &str) {
+        let mut file = File::create(filename)
+            .expect("Failed to create CSV file");
+
+        for d in distances {
+            writeln!(file, "{d}")
+                .expect("Failed to write distance value");
+        }
     }
 
     /// Logs a solution's schedule and its evaluation metrics.
