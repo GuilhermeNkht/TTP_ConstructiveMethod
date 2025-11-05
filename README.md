@@ -15,7 +15,7 @@ This repository contains the code and materials for our paper:
 
 We implemented a **constructive method based on the Circle Method** (Kirkman, 1847) to generate many valid initial schedules for the TTP.  
 The algorithm runs in O(n) time for n teams.  
-By adjusting parameters, it can produce up to 2n · n! different schedules.  
+By adjusting parameters, it can produce up to 2n · n! different schedules.
 
 The main goal is to provide metaheuristics with a large pool of feasible solutions from the start.
 
@@ -25,13 +25,13 @@ The main goal is to provide metaheuristics with a large pool of feasible solutio
 
 The Traveling Tournament Problem (TTP) schedules a double round-robin tournament for an even number of teams, where each team plays every other team twice (home and away), while respecting the following constraints:
 
-1. Maximum Streak (maxStreak) – No team plays more than n consecutive home or away games.  
-2. No Repeats (noRepeat) – Teams cannot face the same opponent in consecutive rounds.  
+1. Maximum Streak (maxStreak) – No team plays more than n consecutive home or away games.
+2. No Repeats (noRepeat) – Teams cannot face the same opponent in consecutive rounds.
 3. Double Round-Robin (doubleRoundRobin) – Each team plays only one game per round.
 
 <div align="center">
 <b>Example:</b><br>
-<img src="ttpgen/images/ttp.png" alt="Traveling Tournament Problem (TTP)" width="400"/><br>
+<img src="examples/images/ttp.png" alt="Traveling Tournament Problem (TTP)" width="400"/><br>
 <i>Figure 1:</i> Left: A valid 4-team TTP tournament. Right: An invalid TTP tournament, with a `noRepeat` violation in column 2, a `maxStreak = 3` violation in column 4, and `doubleRoundRobin` violations in rounds (rows) 2, 3, and 4.
 </div>
 
@@ -99,7 +99,7 @@ After building, run the executable with:
 --permutations <n> : Number of random team permutations to generate  
 --seed <n> : Random seed for reproducibility  
 --log : Enable or disable logging
---save : Enable or disable saving to disk  
+--save : Enable or disable saving to disk
 
 ---
 
@@ -111,16 +111,16 @@ After building, run the executable with:
 <b>Output Example for NL8:</b><br><br>
 
 <b>1. Example of permutation (JSON):</b>  
-[outputs/permutations/perms.json](ttpgen/permutations/permutation.json)<br><br>
+[examples/permutations/perms.json](ttpgen/permutations/permutation.json)<br><br>
 
 <b>2. Example of solution (JSON):</b>  
-[outputs/solutions/solutions_1.json](ttpgen/solutions/solution_1.json)<br><br>
+[examples/solutions/solutions_1.json](ttpgen/solutions/solution_1.json)<br><br>
 
 <b>3. Example of final print in log:</b>  
-[outputs/log.txt](ttpgen/log.txt)<br><br>
+[examples/log.txt](ttpgen/log.txt)<br><br>
 
 <b>4. Example of final histogram:</b>  
-[outputs/dist_histogram.png](ttpgen/images/dist_histogram.png)<br>
+[examples/dist_histogram.png](ttpgen/images/dist_histogram.png)<br>
 </div>
 
 
@@ -132,11 +132,11 @@ The full API documentation for this project can be found here: [View documentati
 
 ## Features Summary
 
-- Multiple random permutations: Generate different solutions for the same instance.  
-- Travel distance evaluation: Computes total travel distance for each schedule.  
-- Statistics: Mean, median, variance, standard deviation, min/max, quartiles.  
-- Plotting: Create histograms of travel distances.  
-- Logging: Optional detailed logs for analysis.  
+- Multiple random permutations: Generate different solutions for the same instance.
+- Travel distance evaluation: Computes total travel distance for each schedule.
+- Statistics: Mean, median, variance, standard deviation, min/max, quartiles.
+- Plotting: Create histograms of travel distances.
+- Logging: Optional detailed logs for analysis.
 - JSON Output: Solutions and permutations are reproducible and portable.
 
 ---
