@@ -1,10 +1,7 @@
 # A Constructive Method to Build Many Valid Initial Solutions for the Traveling Tournament Problem
 
 **Authors:**  
-Guilherme Nakahata (AIST, University of Tsukuba)  
-Florian Richoux (AIST, Japan)  
-Daan van den Berg (Vrije Universiteit Amsterdam, Netherlands)  
-Claus Aranha (University of Tsukuba, Japan)
+
 
 ---
 
