@@ -163,5 +163,5 @@ If you use this code or ideas from this work, please cite this work (to be added
 
 ## License
 
-This project is distributed under the XXXXX License.  
+This project is distributed under the [LICENSE](LICENSE) License.  
 See the LICENSE file for details.
