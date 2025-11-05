@@ -1,13 +1,10 @@
 /target/
-
-**/*.rs.bk
-**/*.rlib
-
 /.idea/
 /*.iml
-
 *.log
 *.tmp
 *.swp
 *.swo
 .DS_Store
+/permutations
+/solutions
