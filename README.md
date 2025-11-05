@@ -111,16 +111,16 @@ After building, run the executable with:
 <b>Output Example for NL8:</b><br><br>
 
 <b>1. Example of permutation (JSON):</b>  
-[examples/permutations/perms.json](ttpgen/permutations/permutation.json)<br><br>
+[examples/permutations/perms.json](examples/permutations/permutation.json)<br><br>
 
 <b>2. Example of solution (JSON):</b>  
-[examples/solutions/solutions_1.json](ttpgen/solutions/solution_1.json)<br><br>
+[examples/solutions/solutions_1.json](examples/solutions/solution_1.json)<br><br>
 
 <b>3. Example of final print in log:</b>  
-[examples/log.txt](ttpgen/log.txt)<br><br>
+[examples/log.txt](examples/log.txt)<br><br>
 
 <b>4. Example of final histogram:</b>  
-[examples/dist_histogram.png](ttpgen/images/dist_histogram.png)<br>
+[examples/dist_histogram.png](examples/images/dist_histogram.png)<br>
 </div>
 
 
