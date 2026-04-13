@@ -1,9 +1,5 @@
 # A Constructive Method to Build Many Valid Initial Solutions for the Traveling Tournament Problem
 
-**Authors:**  
-
-
----
 
 ## Abstract
 
