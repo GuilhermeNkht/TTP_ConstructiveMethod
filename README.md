@@ -154,7 +154,14 @@ Statistics::generate_statistics(&distances);
 
 ## Citation
 
-If you use this code or ideas from this work, please cite this work (to be added).
+If you use this code or ideas from this work, please cite this work.
+
+@inproceedings{Nakahata2026,
+  author = {Guilherme Nakahata and Florian Richoux and Daan van den Berg and Claus Aranha},
+  title = {A Constructive Method to Build Many Valid Initial Solutions for the Traveling Tournament Problem},
+  year = {2026},
+  address = {Toulouse, France}
+}
 
 ---
 
